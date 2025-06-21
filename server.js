@@ -397,7 +397,32 @@ router.post("/query-tools", function (req, res, next) {
   });
 });
 
+app.get("/api/:date?", (req, res) => {
+  let dateParam = req.params.date;
+  let date;
+
+  if (!dateParam) {
+    date = new Date();
+  } else if (!isNaN(dateParam)) {
+    const timestamp = dateParam.length === 13 ? parseInt(dateParam) : parseInt(dateParam) * 1000;
+    date = new Date(timestamp);
+  } else {
+    date = new Date(dateParam);
+  }
+
+  if (date.toString() === "Invalid Date") {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
+});
+
+
 app.use("/_api", enableCORS, router);
+
 
 // Error handler
 app.use(function (err, req, res, next) {
